@@ -1,0 +1,53 @@
+plugins {
+    id 'groovy'
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
+}
+
+group = "io.github.Ruanfonseca"
+version = "1.0.0"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation localGroovy()
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            groupId = "io.github.Ruanfonseca"
+            artifactId = "fuzzy-matcher"
+            version = "1.0.0"
+        }
+    }
+
+    repositories {
+        maven {
+            name = "sonatype"
+            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = ossrhUsername
+                password = ossrhPassword
+            }
+        }
+    }
+}
+
+signing {
+    useInMemoryPgpKeys(
+            System.getenv("SIGNING_KEY"),
+            System.getenv("SIGNING_PASSWORD")
+    )
+    sign publishing.publications
+}
